@@ -1,0 +1,133 @@
+:host {
+  --bg: #0f1724;
+  --card: #0b1220;
+  --muted: #9aa4b2;
+  --accent: #6ee7b7;
+  --accent-2: #60a5fa;
+  --surface: #0b1220;
+  --radius: 12px;
+
+  .app-root {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 20px;
+    background: linear-gradient(180deg, #071029 0%, #08121b 100%);
+    font-family:
+      Inter,
+      system-ui,
+      -apple-system,
+      'Segoe UI',
+      Roboto,
+      'Helvetica Neue',
+      Arial;
+    color: #e6eef6;
+
+    .card {
+      width: 100%;
+      max-width: 760px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.02), rgba(255, 255, 255, 0.01));
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      border-radius: var(--radius);
+      padding: 24px;
+      box-shadow: 0 8px 30px rgba(2, 6, 23, 0.6);
+
+      .card-header {
+        margin-bottom: 18px;
+
+        .title {
+          margin: 0 0 6px 0;
+          font-size: 20px;
+          letter-spacing: -0.2px;
+        }
+
+        .subtitle {
+          margin: 0;
+          font-size: 13px;
+          color: var(--muted);
+        }
+      }
+      .controls {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        margin: 12px 0 18px 0;
+        flex-wrap: wrap;
+
+        .input {
+          flex: 1 1 260px;
+          min-width: 180px;
+          padding: 12px 14px;
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.04);
+          background: rgba(255, 255, 255, 0.01);
+          color: inherit;
+          font-size: 15px;
+          outline: none;
+
+          &:focus {
+            box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.08);
+            border-color: rgba(96, 165, 250, 0.45);
+          }
+        }
+
+        .btn {
+          padding: 10px 16px;
+          border-radius: 10px;
+          border: none;
+          cursor: pointer;
+          font-weight: 600;
+          transition:
+            transform 0.08s ease,
+            box-shadow 0.08s ease,
+            opacity 0.12s ease;
+
+          &:active {
+            transform: translateY(1px);
+          }
+
+          &.primary {
+            background: linear-gradient(90deg, var(--accent), var(--accent-2));
+            color: #cfe9f5;
+            box-shadow: 0 6px 18px rgba(96, 165, 250, 0.12);
+          }
+        }
+      }
+
+      .output {
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 10px;
+        padding: 16px;
+        border: 1px solid rgba(255, 255, 255, 0.03);
+
+        .script {
+          margin: 0;
+          white-space: pre-wrap;
+          font-family:
+            ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace;
+          font-size: 14px;
+          line-height: 1.55;
+          color: #cfe9f5;
+        }
+      }
+    }
+  }
+}
+
+.btn[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 520px) {
+  .card {
+    padding: 16px;
+  }
+  .title {
+    font-size: 18px;
+  }
+  .controls {
+    gap: 8px;
+  }
+}

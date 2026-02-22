@@ -1,0 +1,29 @@
+<div class="app-root">
+  <div class="card">
+    <header class="card-header">
+      <h1 class="title">🤖 Content Generator</h1>
+      <p class="subtitle">Generate scripts or content for your social media platforms</p>
+    </header>
+
+    <section class="controls">
+      <input
+        class="input"
+        [(ngModel)]="aiTool"
+        placeholder="Enter any topic or concept to generate content about..."
+        aria-label="AI Tool"
+          (keyup.enter)="generate()"
+      />
+
+      <button class="btn primary" (click)="generate()" [disabled]="isLoading()">
+        {{ isLoading() ? 'Generating...' : 'Generate' }}
+      </button>
+    </section>
+
+    @if (script()) {
+      <section class="output" aria-live="polite">
+        <pre class="script">{{ script() }}</pre>
+      </section>
+    }
+
+  </div>
+</div>
