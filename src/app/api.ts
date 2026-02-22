@@ -1,12 +1,13 @@
 import { Injectable } from '@angular/core';
 import { GenerateContentStreamResult, GoogleGenerativeAI } from '@google/generative-ai';
 import { SYSTEM_PROMPT } from './constants';
+import { environment } from '../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
 })
 export class Api {
-  private apiKey = 'AIzaSyBHbofXhSBEDDGZlZ1_iaTv106xzJDcVdI';
+  private apiKey = environment.geminiAPIkey;
   private genAI = new GoogleGenerativeAI(this.apiKey);
 
   async generateScript(userInput: string): Promise<GenerateContentStreamResult> {
