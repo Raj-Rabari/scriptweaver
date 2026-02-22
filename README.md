@@ -1,59 +1,130 @@
-# Scriptweaver
+# 🤖 ScriptWeaver - Content Generator
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.0.4.
+ScriptWeaver is an intelligent content generation tool powered by Google's Gemini AI. It helps creators generate engaging, platform-optimized scripts and content for various social media platforms.
 
-## Development server
+## Features
 
-To start a local development server, run:
+- 🎬 **Multi-Platform Support**: Generate content tailored for Instagram, YouTube, TikTok, X/Twitter, LinkedIn, and more
+- 🚀 **Smart Content Optimization**: AI-powered system that analyzes your topic and creates viral-ready content
+- ⚡ **Real-time Streaming**: Watch content generate in real-time as the AI thinks
+- 📝 **Format-Specific Generation**:
+  - Short-form video scripts (Reels, TikTok, Shorts)
+  - Long-form tutorial scripts (YouTube)
+  - Social media posts (Twitter, LinkedIn, Instagram captions)
+  - AI avatar scripts with stage directions
+- 🎨 **Modern UI**: Clean, responsive design with dark theme
+- ♿ **Accessible**: Built with accessibility best practices
 
-```bash
-ng serve
-```
+## Tech Stack
 
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
+- **Framework**: Angular 21
+- **Language**: TypeScript 5.9
+- **AI**: Google Generative AI (Gemini 2.5 Flash)
+- **Styling**: SCSS
+- **Testing**: Vitest
+- **Build Tool**: Angular CLI
 
-## Code scaffolding
+## Getting Started
 
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+### Prerequisites
 
-```bash
-ng generate component component-name
-```
+- Node.js 18+ and npm 11.6.2+
+- Google Generative AI API key
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
-
-```bash
-ng generate --help
-```
-
-## Building
-
-To build the project run:
-
-```bash
-ng build
-```
-
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
-
-## Running unit tests
-
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
+### Installation
 
 ```bash
-ng test
+# Clone the repository
+git clone https://github.com/yourusername/scriptweaver.git
+cd scriptweaver
+
+# Install dependencies
+npm install
 ```
 
-## Running end-to-end tests
+### Configuration
 
-For end-to-end (e2e) testing, run:
+1. Get your API key from [Google AI Studio](https://aistudio.google.com/apikey)
+2. Update the API key in `src/app/api.ts`:
+
+```typescript
+private apiKey = 'YOUR_API_KEY_HERE';
+```
+
+### Development
 
 ```bash
-ng e2e
+# Start development server
+npm start
+# Navigate to http://localhost:4200/
 ```
 
-Angular CLI does not come with an end-to-end testing framework by default. You can choose one that suits your needs.
+### Build
 
-## Additional Resources
+```bash
+# Build for production
+npm run build
+# Output will be in dist/scriptweaver
+```
 
-For more information on using the Angular CLI, including detailed command references, visit the [Angular CLI Overview and Command Reference](https://angular.dev/tools/cli) page.
+### Testing
+
+```bash
+# Run unit tests
+npm test
+```
+
+## Usage
+
+1. Enter your topic or concept in the input field
+2. Optionally specify a platform (Instagram, YouTube, TikTok, etc.)
+3. Click "Generate" to create content
+4. Watch as the AI generates your content in real-time
+5. Copy and use the generated content on your platform
+
+## Project Structure
+
+```
+src/
+├── app/
+│   ├── api.ts              # Google Generative AI service
+│   ├── app.ts              # Main component
+│   ├── app.html            # Component template
+│   ├── app.scss            # Component styles
+│   ├── constants.ts        # System prompt for AI
+│   └── app.spec.ts         # Component tests
+├── main.ts                 # Application entry point
+└── styles.scss             # Global styles
+```
+
+## Key Components
+
+- **[Api Service](src/app/api.ts)**: Handles communication with Google Generative AI
+- **[App Component](src/app/app.ts)**: Main UI and content generation logic
+- **[Constants](src/app/constants.ts)**: System prompt that guides AI behavior
+
+## How It Works
+
+The system uses a sophisticated prompt engineering approach to generate platform-specific content:
+
+1. Analyzes the user's input for platform mentions
+2. Determines the appropriate content format
+3. Applies format-specific guidelines (hooks, CTAs, hashtags, etc.)
+4. Streams the response in real-time for immediate feedback
+
+## License
+
+MIT License - feel free to use this project for personal and commercial purposes
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+## Author
+
+[Your Name](https://github.com/yourusername)
+
+## Acknowledgments
+
+- Built with [Angular](https://angular.dev)
+- Powered by [Google Generative AI](https://ai.google.dev)
