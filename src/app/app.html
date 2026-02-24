@@ -1,29 +1,55 @@
 <div class="app-root">
-  <div class="card">
-    <header class="card-header">
+  <div class="chat-container">
+    <header class="chat-header">
       <h1 class="title">🤖 Content Generator</h1>
       <p class="subtitle">Generate scripts or content for your social media platforms</p>
     </header>
 
-    <section class="controls">
-      <input
-        class="input"
-        [(ngModel)]="aiTool"
-        placeholder="Enter any topic or concept to generate content about..."
-        aria-label="AI Tool"
+    <div class="chat-messages">
+      @if (conversations().length === 0) {
+        <div class="empty-state">
+          <p>Start a conversation by asking a question below</p>
+        </div>
+      } @else {
+        @for (item of conversations(); track item.prompt) {
+          <div class="message-group">
+            <div class="message user-message">
+              <div class="message-content">{{ item.prompt }}</div>
+            </div>
+            <div class="message assistant-message">
+              <div class="message-content" [innerHTML]="getHtmlContent(item.response)"></div>
+            </div>
+          </div>
+        }
+      }
+
+      @if (isLoading()) {
+        <div class="message-group">
+          <div class="message assistant-message">
+            <div class="message-content loading">Generating...</div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <section class="input-area">
+      <div class="input-wrapper">
+        <input
+          class="input"
+          [(ngModel)]="userPrompt"
+          placeholder="Enter any topic or concept to generate content about..."
+          aria-label="user prompt"
           (keyup.enter)="generate()"
-      />
-
-      <button class="btn primary" (click)="generate()" [disabled]="isLoading()">
-        {{ isLoading() ? 'Generating...' : 'Generate' }}
-      </button>
+          [disabled]="isLoading()"
+        />
+        <button class="btn primary" (click)="generate()" [disabled]="isLoading()" aria-label="send message">
+          @if (isLoading()) {
+            <span>⏳</span>
+          } @else {
+            <span>➤</span>
+          }
+        </button>
+      </div>
     </section>
-
-    @if (script()) {
-      <section class="output" aria-live="polite">
-        <pre class="script">{{ script() }}</pre>
-      </section>
-    }
-
   </div>
 </div>

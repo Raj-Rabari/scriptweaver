@@ -2,6 +2,13 @@ import { Component, inject, signal, WritableSignal } from '@angular/core';
 import { Api } from './api';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { SafeHtml } from '@angular/platform-browser';
+import { marked } from 'marked';
+
+interface ConversationItem {
+  prompt: string;
+  response: string;
+}
 
 @Component({
   selector: 'app-root',
@@ -10,31 +17,47 @@ import { FormsModule } from '@angular/forms';
   styleUrls: ['./app.scss'],
 })
 export class App {
-  aiTool = '';
-  script: WritableSignal<string> = signal('');
+  userPrompt = '';
   isLoading: WritableSignal<boolean> = signal(false);
+  conversations: WritableSignal<ConversationItem[]> = signal([]);
 
   // Inject the service we created
   private apiService = inject(Api);
 
   async generate() {
-    if (!this.aiTool) return;
+    if (!this.userPrompt) return;
 
     this.isLoading.set(true);
-    this.script.set(''); // Clear previous script
+    const prompt = this.userPrompt;
+    this.userPrompt = ''; // Clear input
+    let fullResponse = '';
 
     try {
-      const contentStream = await this.apiService.generateScript(this.aiTool);
-      let content = '';
-      for await (const chunk of contentStream.stream) {
-        content += chunk.text();
-        this.script.set(content);
-      }
+      await this.apiService.generateScript(prompt, (script) => {
+        fullResponse = script;
+      });
+
+      // Add to conversation history
+      const conversations = this.conversations();
+      conversations.push({
+        prompt,
+        response: fullResponse,
+      });
+      this.conversations.set([...conversations]);
     } catch (error) {
-      this.script.set('Error generating script. Please check your API key or internet connection.');
       console.error(error);
+      const conversations = this.conversations();
+      conversations.push({
+        prompt,
+        response: 'Something went wrong while generating the content. Please try again later.',
+      });
+      this.conversations.set([...conversations]);
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  getHtmlContent(markdown: string): SafeHtml {
+    return marked.parse(markdown);
   }
 }
