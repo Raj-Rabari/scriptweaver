@@ -1,5 +1,6 @@
 import { HttpClient, HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
+import { environment } from '../environments/environment.development';
 
 @Injectable({
   providedIn: 'root',
@@ -7,11 +8,13 @@ import { inject, Injectable } from '@angular/core';
 export class Api {
   http = inject(HttpClient);
 
+  apiUrl = `${environment.apiUrl}/api/generate-script`;
+
   async generateScript(userInput: string, onProgress: (text: string) => void): Promise<void> {
     return new Promise((resolve, reject) => {
       this.http
         .post(
-          'http://localhost:3000/api/generate-script',
+          this.apiUrl,
           { userInput },
           {
             observe: 'events',
