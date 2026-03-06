@@ -8,7 +8,7 @@ import { environment } from '../environments/environment';
 export class Api {
   http = inject(HttpClient);
 
-  apiUrl = `${environment.apiUrl}/api/generate-script`;
+  apiUrl = `${environment.apiUrl}/generate-script`;
 
   async generateScript(userInput: string, onProgress: (text: string) => void): Promise<void> {
     return new Promise((resolve, reject) => {
