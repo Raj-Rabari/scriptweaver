@@ -1,47 +1,55 @@
 <div class="app-root">
   <div class="chat-container">
     <header class="chat-header">
-      <h1 class="title">🤖 Content Generator</h1>
+      <div class="header-top">
+        <h1 class="title">✦ ScriptWeaver</h1>
+        <div class="header-actions">
+          @if (conversations().length > 0) {
+            <button class="btn-clear" (click)="clearHistory()">Clear</button>
+          }
+          @if (user()) {
+            <span class="user-name">{{ user()!.name }}</span>
+            <button class="btn-clear" (click)="logout()">Sign out</button>
+          }
+        </div>
+      </div>
       <p class="subtitle">Generate scripts or content for your social media platforms</p>
     </header>
 
-    <div class="chat-messages">
+    <div class="chat-messages" #messagesContainer>
       @if (conversations().length === 0) {
         <div class="empty-state">
           <p>Start a conversation by asking a question below</p>
         </div>
       } @else {
-        @for (item of conversations(); track item.prompt) {
+        @for (item of conversations(); track $index) {
           <div class="message-group">
             <div class="message user-message">
               <div class="message-content">{{ item.prompt }}</div>
             </div>
             <div class="message assistant-message">
-              <div class="message-content" [innerHTML]="getHtmlContent(item.response)"></div>
+              @if (item.response) {
+                <div class="message-content" [innerHTML]="getHtmlContent(item.response)"></div>
+              } @else {
+                <div class="message-content loading">Generating...</div>
+              }
             </div>
           </div>
         }
-      }
-
-      @if (isLoading()) {
-        <div class="message-group">
-          <div class="message assistant-message">
-            <div class="message-content loading">Generating...</div>
-          </div>
-        </div>
       }
     </div>
 
     <section class="input-area">
       <div class="input-wrapper">
-        <input
+        <textarea
           class="input"
           [(ngModel)]="userPrompt"
-          placeholder="Enter any topic or concept to generate content about..."
+          placeholder="Enter any topic or concept to generate content about... (Shift+Enter for new line)"
           aria-label="user prompt"
-          (keyup.enter)="generate()"
+          (keydown)="onKeydown($event)"
           [disabled]="isLoading()"
-        />
+          rows="1"
+        ></textarea>
         <button class="btn primary" (click)="generate()" [disabled]="isLoading()" aria-label="send message">
           @if (isLoading()) {
             <span>⏳</span>
