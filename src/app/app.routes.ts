@@ -13,7 +13,15 @@ export const routes: Routes = [
   {
     path: 'c',
     canActivate: [authGuard],
-    loadComponent: () => import('./app').then((m) => m.App),
+    loadComponent: () =>
+      import('./conversations/chat-layout/chat-layout').then((m) => m.ChatLayout),
+    children: [
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./conversations/conversation/conversation').then((m) => m.Conversation),
+      },
+    ],
   },
   { path: '', redirectTo: '/c', pathMatch: 'full' },
   { path: '**', redirectTo: '/c' },

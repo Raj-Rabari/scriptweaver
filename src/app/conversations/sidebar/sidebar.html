@@ -1,0 +1,41 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <span class="brand">✦ ScriptWeaver</span>
+    <button class="btn-new" (click)="newChat()" [disabled]="creating()">
+      @if (creating()) {
+        <span class="spinner">…</span>
+      } @else {
+        <span>+</span> New chat
+      }
+    </button>
+  </div>
+
+  <div class="conversation-list">
+    @if (loading() && conversations().length === 0) {
+      <p class="list-placeholder">Loading…</p>
+    }
+
+    @for (conv of conversations(); track conv.id) {
+      <button class="conv-item" [class.active]="isActive(conv.id)" (click)="navigate(conv.id)">
+        <span class="conv-title">{{ conv.title }}</span>
+        <span
+          class="btn-delete"
+          role="button"
+          title="Delete"
+          (click)="deleteConversation($event, conv.id)"
+        >✕</span>
+      </button>
+    }
+
+    @if (!loading() && conversations().length === 0) {
+      <p class="no-convs">No conversations yet</p>
+    }
+  </div>
+
+  <div class="sidebar-footer">
+    @if (user()) {
+      <span class="user-email">{{ user()!.email }}</span>
+    }
+    <button class="btn-logout" (click)="logout()">Sign out</button>
+  </div>
+</nav>
