@@ -72,11 +72,19 @@ export class ConversationsService {
     return res.messages;
   }
 
+  async archiveConversation(id: string): Promise<void> {
+    await firstValueFrom(this.http.patch(`${this.base}/${id}`, { archived: true }));
+    this.conversations.update((list) => list.filter((c) => c.id !== id));
+  }
+
   sendMessage(
     conversationId: string,
     content: string,
     onProgress: (text: string) => void,
   ): Promise<void> {
+    const isFirstExchange =
+      (this.conversations().find((c) => c.id === conversationId)?.messageCount ?? 0) === 0;
+
     return new Promise((resolve, reject) => {
       this.http
         .post(`${this.base}/${conversationId}/messages`, { content }, {
@@ -90,7 +98,7 @@ export class ConversationsService {
               const partial = (event as HttpDownloadProgressEvent).partialText;
               if (partial) onProgress(partial);
             } else if (event.type === HttpEventType.Response) {
-              // Optimistically refresh conversation counters in sidebar
+              // Immediate optimistic update for counters
               this.conversations.update((list) =>
                 list.map((c) =>
                   c.id === conversationId
@@ -103,6 +111,21 @@ export class ConversationsService {
                     : c,
                 ),
               );
+              // Delayed re-fetch to pick up async server changes (title autogen on first exchange)
+              const delay = isFirstExchange ? 2000 : 0;
+              if (delay > 0) {
+                setTimeout(() => {
+                  firstValueFrom(
+                    this.http.get<{ conversation: Conversation }>(`${this.base}/${conversationId}`),
+                  )
+                    .then((res) => {
+                      this.conversations.update((list) =>
+                        list.map((c) => (c.id === conversationId ? res.conversation : c)),
+                      );
+                    })
+                    .catch(() => {/* best-effort */});
+                }, delay);
+              }
               resolve();
             }
           },
