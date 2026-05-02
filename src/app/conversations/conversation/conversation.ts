@@ -11,7 +11,6 @@ import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { marked } from 'marked';
-import { Api } from '../../api';
 import { ConversationsService } from '../conversations.service';
 
 interface MessageItem {
@@ -30,7 +29,6 @@ export class Conversation implements OnInit {
   @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLElement>;
 
   private route = inject(ActivatedRoute);
-  private apiService = inject(Api);
   private conversationsService = inject(ConversationsService);
 
   userPrompt = '';
@@ -63,7 +61,8 @@ export class Conversation implements OnInit {
   }
 
   async generate() {
-    if (!this.userPrompt.trim() || this.isLoading()) return;
+    const id = this.conversationId();
+    if (!id || !this.userPrompt.trim() || this.isLoading()) return;
 
     this.isLoading.set(true);
     const prompt = this.userPrompt.trim();
@@ -75,7 +74,7 @@ export class Conversation implements OnInit {
     this.scrollToBottom();
 
     try {
-      await this.apiService.generateScript(prompt, (text) => {
+      await this.conversationsService.sendMessage(id, prompt, (text) => {
         this.messages.update((list) => {
           const updated = [...list];
           updated[assistantIdx] = { role: 'assistant', content: text };

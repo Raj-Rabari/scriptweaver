@@ -1,5 +1,5 @@
 import { inject, Injectable, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
 import { firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 
@@ -70,5 +70,44 @@ export class ConversationsService {
       ),
     );
     return res.messages;
+  }
+
+  sendMessage(
+    conversationId: string,
+    content: string,
+    onProgress: (text: string) => void,
+  ): Promise<void> {
+    return new Promise((resolve, reject) => {
+      this.http
+        .post(`${this.base}/${conversationId}/messages`, { content }, {
+          observe: 'events',
+          reportProgress: true,
+          responseType: 'text',
+        })
+        .subscribe({
+          next: (event) => {
+            if (event.type === HttpEventType.DownloadProgress) {
+              const partial = (event as HttpDownloadProgressEvent).partialText;
+              if (partial) onProgress(partial);
+            } else if (event.type === HttpEventType.Response) {
+              // Optimistically refresh conversation counters in sidebar
+              this.conversations.update((list) =>
+                list.map((c) =>
+                  c.id === conversationId
+                    ? {
+                        ...c,
+                        messageCount: c.messageCount + 2,
+                        lastMessageAt: new Date().toISOString(),
+                        updatedAt: new Date().toISOString(),
+                      }
+                    : c,
+                ),
+              );
+              resolve();
+            }
+          },
+          error: (err: unknown) => reject(err),
+        });
+    });
   }
 }
