@@ -10,6 +10,7 @@ import {
 import { ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { HttpErrorResponse } from '@angular/common/http';
 import { marked } from 'marked';
 import { ConversationsService } from '../conversations.service';
 
@@ -17,6 +18,7 @@ interface MessageItem {
   role: 'user' | 'assistant';
   content: string;
   loading?: boolean;
+  error?: boolean;
 }
 
 @Component({
@@ -35,6 +37,7 @@ export class Conversation implements OnInit {
   isLoading = signal(false);
   messages = signal<MessageItem[]>([]);
   conversationId = signal<string | null>(null);
+  loadError = signal<string | null>(null);
 
   currentConversation = computed(() => {
     const id = this.conversationId();
@@ -46,6 +49,7 @@ export class Conversation implements OnInit {
       const id = params.get('id');
       this.conversationId.set(id);
       this.messages.set([]);
+      this.loadError.set(null);
       if (id) void this.loadMessages(id);
     });
   }
@@ -54,8 +58,11 @@ export class Conversation implements OnInit {
     try {
       const msgs = await this.conversationsService.loadMessages(id);
       this.messages.set(msgs.map((m) => ({ role: m.role, content: m.content })));
-    } catch {
-      // conversation may not exist yet or is empty
+    } catch (err) {
+      const status = err instanceof HttpErrorResponse ? err.status : 0;
+      if (status !== 404) {
+        this.loadError.set('Could not load messages. Please refresh.');
+      }
     }
     this.scrollToBottom();
   }
@@ -82,13 +89,17 @@ export class Conversation implements OnInit {
         });
         this.scrollToBottom();
       });
-    } catch {
+    } catch (err) {
+      const status = err instanceof HttpErrorResponse ? err.status : 0;
+      const content =
+        status === 429
+          ? 'Rate limit reached. Please wait a moment before sending another message.'
+          : status === 403
+            ? 'This conversation is full (50 messages). Please start a new chat.'
+            : 'Something went wrong. Please try again.';
       this.messages.update((list) => {
         const updated = [...list];
-        updated[assistantIdx] = {
-          role: 'assistant',
-          content: 'Something went wrong. Please try again.',
-        };
+        updated[assistantIdx] = { role: 'assistant', content, error: true };
         return updated;
       });
     } finally {

@@ -14,6 +14,9 @@
     @if (loading() && conversations().length === 0) {
       <p class="list-placeholder">Loading…</p>
     }
+    @if (loadError()) {
+      <p class="list-error">{{ loadError() }}</p>
+    }
 
     @for (conv of conversations(); track conv.id) {
       <div
@@ -64,6 +67,16 @@
   </div>
 
   <div class="sidebar-footer">
+    <div class="quota">
+      <div class="quota-bar">
+        <div
+          class="quota-fill"
+          [style.width.%]="(activeCount() / maxConversations) * 100"
+          [class.quota-warn]="activeCount() >= maxConversations * 0.9"
+        ></div>
+      </div>
+      <span class="quota-label">{{ activeCount() }} / {{ maxConversations }} chats</span>
+    </div>
     @if (user()) {
       <span class="user-email">{{ user()!.email }}</span>
     }

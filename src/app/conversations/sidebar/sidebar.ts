@@ -1,4 +1,4 @@
-import { Component, HostListener, inject, signal } from '@angular/core';
+import { Component, computed, HostListener, inject, signal } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,7 +19,11 @@ export class Sidebar {
 
   conversations = this.conversationsService.conversations;
   loading = this.conversationsService.loading;
+  loadError = this.conversationsService.loadError;
   user = this.auth.user;
+
+  readonly maxConversations = 200;
+  activeCount = computed(() => this.conversations().filter((c) => !c.archived).length);
 
   creating = signal(false);
   menuOpenId = signal<string | null>(null);

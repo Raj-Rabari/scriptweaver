@@ -29,14 +29,18 @@ export class ConversationsService {
 
   conversations = signal<Conversation[]>([]);
   loading = signal(false);
+  loadError = signal<string | null>(null);
 
   async loadConversations(): Promise<void> {
     this.loading.set(true);
+    this.loadError.set(null);
     try {
       const res = await firstValueFrom(
         this.http.get<{ conversations: Conversation[]; nextCursor: string | null }>(this.base),
       );
       this.conversations.set(res.conversations);
+    } catch {
+      this.loadError.set('Could not load conversations. Please refresh.');
     } finally {
       this.loading.set(false);
     }
@@ -70,6 +74,14 @@ export class ConversationsService {
       ),
     );
     return res.messages;
+  }
+
+  async importLocalStorage(items: { prompt: string; response: string }[]): Promise<Conversation> {
+    const res = await firstValueFrom(
+      this.http.post<{ conversation: Conversation }>(`${this.base}/import`, { items }),
+    );
+    this.conversations.update((list) => [res.conversation, ...list]);
+    return res.conversation;
   }
 
   async archiveConversation(id: string): Promise<void> {

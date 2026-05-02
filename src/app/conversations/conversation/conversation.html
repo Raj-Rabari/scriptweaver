@@ -7,7 +7,10 @@
   </header>
 
   <div class="chat-messages" #messagesContainer>
-    @if (messages().length === 0) {
+    @if (loadError()) {
+      <div class="load-error">{{ loadError() }}</div>
+    }
+    @if (messages().length === 0 && !loadError()) {
       <div class="empty-state">
         <p>Start a conversation by asking a question below</p>
       </div>
@@ -22,6 +25,8 @@
             <div class="message assistant-message">
               @if (item.loading) {
                 <div class="message-content loading">Generating…</div>
+              } @else if (item.error) {
+                <div class="message-content error">{{ item.content }}</div>
               } @else {
                 <div class="message-content" [innerHTML]="getHtmlContent(item.content)"></div>
               }

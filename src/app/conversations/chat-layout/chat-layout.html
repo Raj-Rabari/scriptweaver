@@ -3,10 +3,32 @@
   <main class="main">
     <router-outlet #outlet="outlet" />
     @if (!outlet.isActivated) {
-      <div class="empty-state">
-        <div class="empty-icon">💬</div>
-        <p>Select a conversation or start a new one</p>
-      </div>
+      @if (showImportBanner()) {
+        <div class="import-card">
+          <div class="import-icon">📥</div>
+          <h2 class="import-title">Import previous chats?</h2>
+          <p class="import-desc">
+            Found {{ importCount }} exchange{{ importCount === 1 ? '' : 's' }} from your previous
+            session. Import them to keep your history.
+          </p>
+          @if (importError()) {
+            <p class="import-error">{{ importError() }}</p>
+          }
+          <div class="import-actions">
+            <button class="btn-import" (click)="importChats()" [disabled]="importing()">
+              {{ importing() ? 'Importing…' : 'Import chats' }}
+            </button>
+            <button class="btn-skip" (click)="skipImport()" [disabled]="importing()">
+              Skip
+            </button>
+          </div>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <div class="empty-icon">💬</div>
+          <p>Select a conversation or start a new one</p>
+        </div>
+      }
     }
   </main>
 </div>
