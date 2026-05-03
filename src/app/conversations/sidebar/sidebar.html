@@ -1,0 +1,85 @@
+<nav class="sidebar">
+  <div class="sidebar-header">
+    <span class="brand">✦ ScriptWeaver</span>
+    <button class="btn-new" (click)="newChat()" [disabled]="creating()">
+      @if (creating()) {
+        <span class="spinner">…</span>
+      } @else {
+        <span>+</span> New chat
+      }
+    </button>
+  </div>
+
+  <div class="conversation-list">
+    @if (loading() && conversations().length === 0) {
+      <p class="list-placeholder">Loading…</p>
+    }
+    @if (loadError()) {
+      <p class="list-error">{{ loadError() }}</p>
+    }
+
+    @for (conv of conversations(); track conv.id) {
+      <div
+        class="conv-item"
+        [class.active]="isActive(conv.id)"
+        (click)="navigate(conv.id)"
+        role="button"
+        tabindex="0"
+      >
+        @if (editingId() === conv.id) {
+          <input
+            class="rename-input"
+            appAutofocus
+            [(ngModel)]="editTitle"
+            (keydown)="onRenameKeydown($event, conv.id)"
+            (blur)="commitRename(conv.id)"
+            (click)="$event.stopPropagation()"
+          />
+        } @else {
+          <span class="conv-title">{{ conv.title }}</span>
+          <button
+            class="btn-menu"
+            title="More options"
+            (click)="toggleMenu($event, conv.id)"
+            aria-label="More options"
+          >⋯</button>
+
+          @if (menuOpenId() === conv.id) {
+            <div class="conv-menu" (click)="$event.stopPropagation()">
+              <button class="menu-item" (click)="startRename($event, conv.id, conv.title)">
+                Rename
+              </button>
+              <button class="menu-item" (click)="archive($event, conv.id)">
+                Archive
+              </button>
+              <button class="menu-item danger" (click)="deleteConversation($event, conv.id)">
+                Delete
+              </button>
+            </div>
+          }
+        }
+      </div>
+    }
+
+    @if (!loading() && conversations().length === 0) {
+      <p class="no-convs">No conversations yet</p>
+    }
+  </div>
+
+  <div class="sidebar-footer">
+    <div class="quota">
+      <div class="quota-bar">
+        <div
+          class="quota-fill"
+          [style.width.%]="(activeCount() / maxConversations) * 100"
+          [class.quota-warn]="activeCount() >= maxConversations * 0.9"
+        ></div>
+      </div>
+      <span class="quota-label">{{ activeCount() }} / {{ maxConversations }} chats</span>
+    </div>
+    @if (user()) {
+      <span class="user-email">{{ user()!.email }}</span>
+    }
+    <button class="btn-logout" (click)="logout()">Sign out</button>
+  </div>
+</nav>

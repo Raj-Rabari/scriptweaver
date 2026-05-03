@@ -1,8 +1,9 @@
-import { Component, inject, signal, WritableSignal } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, signal, ViewChild, WritableSignal } from '@angular/core';
+import { Router } from '@angular/router';
 import { Api } from './api';
+import { AuthService } from './auth/auth.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { SafeHtml } from '@angular/platform-browser';
 import { marked } from 'marked';
 
 interface ConversationItem {
@@ -10,54 +11,97 @@ interface ConversationItem {
   response: string;
 }
 
+const STORAGE_KEY = 'scriptweaver_conversations';
+
 @Component({
-  selector: 'app-root',
+  selector: 'app-chat',
   imports: [CommonModule, FormsModule],
   templateUrl: './app.html',
   styleUrls: ['./app.scss'],
 })
-export class App {
+export class App implements OnInit {
+  @ViewChild('messagesContainer') private messagesContainer!: ElementRef<HTMLElement>;
+
   userPrompt = '';
   isLoading: WritableSignal<boolean> = signal(false);
   conversations: WritableSignal<ConversationItem[]> = signal([]);
 
-  // Inject the service we created
   private apiService = inject(Api);
+  private authService = inject(AuthService);
+  private router = inject(Router);
 
-  async generate() {
-    if (!this.userPrompt) return;
+  user = this.authService.user;
 
-    this.isLoading.set(true);
-    const prompt = this.userPrompt;
-    this.userPrompt = ''; // Clear input
-    let fullResponse = '';
-
-    try {
-      await this.apiService.generateScript(prompt, (script) => {
-        fullResponse = script;
-      });
-
-      // Add to conversation history
-      const conversations = this.conversations();
-      conversations.push({
-        prompt,
-        response: fullResponse,
-      });
-      this.conversations.set([...conversations]);
-    } catch (error) {
-      console.error(error);
-      const conversations = this.conversations();
-      conversations.push({
-        prompt,
-        response: 'Something went wrong while generating the content. Please try again later.',
-      });
-      this.conversations.set([...conversations]);
-    } finally {
-      this.isLoading.set(false);
+  ngOnInit() {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        this.conversations.set(JSON.parse(saved));
+      } catch {
+        localStorage.removeItem(STORAGE_KEY);
+      }
     }
   }
 
-  getHtmlContent(markdown: string): SafeHtml {
-    return marked.parse(markdown);
+  async generate() {
+    if (!this.userPrompt.trim()) return;
+
+    this.isLoading.set(true);
+    const prompt = this.userPrompt.trim();
+    this.userPrompt = '';
+
+    const idx = this.conversations().length;
+    this.conversations.set([...this.conversations(), { prompt, response: '' }]);
+    this.scrollToBottom();
+
+    try {
+      await this.apiService.generateScript(prompt, (text) => {
+        const updated = [...this.conversations()];
+        updated[idx] = { prompt, response: text };
+        this.conversations.set(updated);
+        this.saveToStorage();
+        this.scrollToBottom();
+      });
+    } catch {
+      const updated = [...this.conversations()];
+      updated[idx] = { prompt, response: 'Something went wrong while generating the content. Please try again later.' };
+      this.conversations.set(updated);
+      this.saveToStorage();
+    } finally {
+      this.isLoading.set(false);
+      this.scrollToBottom();
+    }
+  }
+
+  onKeydown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.generate();
+    }
+  }
+
+  clearHistory() {
+    this.conversations.set([]);
+    localStorage.removeItem(STORAGE_KEY);
+  }
+
+  async logout() {
+    await this.authService.logout();
+    await this.router.navigate(['/login']);
+  }
+
+  getHtmlContent(markdown: string): string {
+    return marked(markdown) as string;
+  }
+
+  private saveToStorage() {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(this.conversations()));
+  }
+
+  private scrollToBottom() {
+    setTimeout(() => {
+      const el = this.messagesContainer?.nativeElement;
+      if (el) el.scrollTop = el.scrollHeight;
+    }, 0);
   }
 }

@@ -1,0 +1,70 @@
+<div class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand">
+      <span class="brand-icon">✦</span>
+      <span class="brand-name">ScriptWeaver</span>
+    </div>
+
+    <h1 class="auth-title">Create an account</h1>
+    <p class="auth-subtitle">Start generating content with AI</p>
+
+    @if (error()) {
+      <div class="error-banner">{{ error() }}</div>
+    }
+
+    <div class="form-group">
+      <label class="form-label" for="name">Name</label>
+      <input
+        id="name"
+        class="form-input"
+        type="text"
+        placeholder="Your name"
+        [(ngModel)]="name"
+        [disabled]="loading()"
+        (keydown)="onKeydown($event)"
+        autocomplete="name"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="email">Email</label>
+      <input
+        id="email"
+        class="form-input"
+        type="email"
+        placeholder="you@example.com"
+        [(ngModel)]="email"
+        [disabled]="loading()"
+        (keydown)="onKeydown($event)"
+        autocomplete="email"
+      />
+    </div>
+
+    <div class="form-group">
+      <label class="form-label" for="password">Password</label>
+      <input
+        id="password"
+        class="form-input"
+        type="password"
+        placeholder="At least 8 characters"
+        [(ngModel)]="password"
+        [disabled]="loading()"
+        (keydown)="onKeydown($event)"
+        autocomplete="new-password"
+      />
+    </div>
+
+    <button class="btn-primary" (click)="submit()" [disabled]="loading()">
+      @if (loading()) {
+        Creating account…
+      } @else {
+        Create account
+      }
+    </button>
+
+    <p class="auth-footer">
+      Already have an account?
+      <a routerLink="/login">Sign in</a>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,60 @@
+<div class="conversation-view">
+  <header class="conv-header">
+    <div class="conv-title">
+      {{ currentConversation()?.title ?? 'New chat' }}
+    </div>
+    <p class="subtitle">Generate scripts or content for your social media platforms</p>
+  </header>
+
+  <div class="chat-messages" #messagesContainer>
+    @if (loadError()) {
+      <div class="load-error">{{ loadError() }}</div>
+    }
+    @if (messages().length === 0 && !loadError()) {
+      <div class="empty-state">
+        <p>Start a conversation by asking a question below</p>
+      </div>
+    } @else {
+      @for (item of messages(); track $index) {
+        <div class="message-group">
+          @if (item.role === 'user') {
+            <div class="message user-message">
+              <div class="message-content">{{ item.content }}</div>
+            </div>
+          } @else {
+            <div class="message assistant-message">
+              @if (item.loading) {
+                <div class="message-content loading">Generating…</div>
+              } @else if (item.error) {
+                <div class="message-content error">{{ item.content }}</div>
+              } @else {
+                <div class="message-content" [innerHTML]="getHtmlContent(item.content)"></div>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+
+  <section class="input-area">
+    <div class="input-wrapper">
+      <textarea
+        class="input"
+        [(ngModel)]="userPrompt"
+        placeholder="Enter any topic or concept to generate content about… (Shift+Enter for new line)"
+        aria-label="user prompt"
+        (keydown)="onKeydown($event)"
+        [disabled]="isLoading()"
+        rows="1"
+      ></textarea>
+      <button class="btn primary" (click)="generate()" [disabled]="isLoading()" aria-label="send message">
+        @if (isLoading()) {
+          <span>⏳</span>
+        } @else {
+          <span>➤</span>
+        }
+      </button>
+    </div>
+  </section>
+</div>
