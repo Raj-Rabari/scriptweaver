@@ -1,15 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Scriptweaver">
+  <rect width="64" height="64" fill="none"/>
   <defs>
-    <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="#1b2541"/>
-      <stop offset="100%" stop-color="#271f5f"/>
-    </linearGradient>
-    <linearGradient id="fill" x1="0" y1="0" x2="1" y2="1">
-      <stop offset="0%" stop-color="#5b93ff"/>
-      <stop offset="100%" stop-color="#2d6cff"/>
+    <linearGradient id="starGradient" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6aa5ff"/>
+      <stop offset="100%" stop-color="#1e64ff"/>
     </linearGradient>
   </defs>
-  <rect width="64" height="64" rx="16" fill="url(#bg)"/>
-  <rect x="12" y="12" width="40" height="40" rx="12" fill="url(#fill)"/>
-  <text x="50%" y="52%" text-anchor="middle" dominant-baseline="middle" font-family="Inter, system-ui, sans-serif" font-size="32" fill="#fff">✦</text>
+  <text x="50%" y="50%" text-anchor="middle" dominant-baseline="middle" font-family="Inter, system-ui, sans-serif" font-size="42" fill="url(#starGradient)" stroke="#ffffff" stroke-width="2" paint-order="stroke">✦</text>
 </svg>
