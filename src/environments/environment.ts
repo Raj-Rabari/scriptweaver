@@ -1,4 +1,4 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://rrabari.in/api', // Make sure there is no trailing slash!
+  apiUrl: 'https://scriptweaver.rrabari.in/api', // Make sure there is no trailing slash!
 };
